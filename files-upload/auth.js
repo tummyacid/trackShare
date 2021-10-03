@@ -60,12 +60,12 @@ async function LookupByEmailAddress(emailAddress) {
     const values = [emailAddress]
     return new Promise(function (resolve, reject) {
 
-        client.connect(async function (err, client, done) {
+        authDB.connect(async function (err, client, done) {
             if (err) {
                 console.log("Can not connect to the DB" + err);
                 reject(err);
             }
-            client.query(text, values)
+            authDB.query(text, values)
                 .then(resPersist => {
                     done();
                     resolve(resPersist.rows[0]); //TODO: check result
@@ -84,12 +84,12 @@ async function CreateLogin(emailAddress, password, moniker) {
     const values = [emailAddress, password, moniker]
     return new Promise(function (resolve, reject) {
 
-        client.connect(async function (err, client, done) {
+        authDB.connect(async function (err, client, done) {
             if (err) {
                 console.log("Can not connect to the DB" + err);
                 reject(err);
             }
-            client.query(text, values)
+            authDB.query(text, values)
                 .then(resPersist => {
                     done();
                     resolve(resPersist.rows[0]); //TODO: check result
