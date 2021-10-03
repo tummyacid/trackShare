@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const { Pool, Client } = require('pg')
 
 const app = express();
-app.use(express.json({limit: '20mb'}))
+app.use(express.json({ limit: '20mb' }))
 app.use(express.urlencoded({ extended: false, limit: '20mb' }))
 
 const authDB = new Pool({
@@ -24,7 +24,7 @@ app.post("/register", async (req, res) => {
     try {
         email = req.body.email;
         password = req.body.password;
-        moniker= req.body.moniker;
+        moniker = req.body.moniker;
 
         if (!(email && password)) {
             res.status(400).send("All input is required");
@@ -39,26 +39,25 @@ app.post("/register", async (req, res) => {
         const salt = await bcrypt.genSalt(0x0365);
         encryptedPassword = await bcrypt.hash(password, salt);
 
-        bcrypt.genSalt(10, function(err, salt) {
-            bcrypt.hash(password, salt, function(err, hash) {
-                userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
-
-                const token = jwt.sign(
-                    { user_id: userNew.id, email },
-                    secrets.TokenKey,
-                    {
-                        expiresIn: "2h",
-                    }
-                );
-        
-                user.token = token;
-        
-                // return new user
-                res.status(201).json(user);
-
+        bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(password, salt, function (err, hash) {
+                encryptedPassword = hash;
             });
-          });       
+        });
+        userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
 
+        const token = jwt.sign(
+            { user_id: userNew.id, email },
+            secrets.TokenKey,
+            {
+                expiresIn: "2h",
+            }
+        );
+
+        user.token = token;
+
+        // return new user
+        res.status(201).json(user);
 
     } catch (err) {
         console.log(err);
