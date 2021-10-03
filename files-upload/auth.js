@@ -22,7 +22,9 @@ const authDB = new Pool({
 
 app.post("/register", async (req, res) => {
     try {
-        const { email, moniker, password } = req.body;
+        email = req.body.email;
+        password = req.body.password;
+        moniker= req.body.moniker;
 
         if (!(email && password)) {
             res.status(400).send("All input is required");
