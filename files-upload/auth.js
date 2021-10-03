@@ -3,7 +3,7 @@ const express = require('express');
 const http = require("http");
 const bodyParser = require('body-parser');
 
-const bcryptjs = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool, Client } = require('pg')
 
