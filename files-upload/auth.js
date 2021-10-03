@@ -39,20 +39,27 @@ app.post("/register", async (req, res) => {
         const salt = await bcrypt.genSalt(0x0365);
         encryptedPassword = await bcrypt.hash(password, salt);
 
-        userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
+        bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.hash(password, salt, function(err, hash) {
+                userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
 
-        const token = jwt.sign(
-            { user_id: userNew.id, email },
-            secrets.TokenKey,
-            {
-                expiresIn: "2h",
-            }
-        );
+                const token = jwt.sign(
+                    { user_id: userNew.id, email },
+                    secrets.TokenKey,
+                    {
+                        expiresIn: "2h",
+                    }
+                );
+        
+                user.token = token;
+        
+                // return new user
+                res.status(201).json(user);
 
-        user.token = token;
+            });
+          });       
 
-        // return new user
-        res.status(201).json(user);
+
     } catch (err) {
         console.log(err);
     }
