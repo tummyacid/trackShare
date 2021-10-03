@@ -22,16 +22,22 @@ const authDB = new Pool({
 
 app.post("/register", async (req, res) => {
     try {
-        userExists = await LookupByEmailAddress(req.body.email);
+        const { email, moniker, password } = req.body;
+
+        if (!(email && password)) {
+            res.status(400).send("All input is required");
+        }
+
+        userExists = await LookupByEmailAddress(email);
 
         if (userExists) {
             return res.status(409).send("User Already Exist.");
         }
 
-	const salt = await bcrypt.genSalt(0x0365);
-        encryptedPassword = await bcrypt.hash(req.body.password, salt);
+        const salt = await bcrypt.genSalt(0x0365);
+        encryptedPassword = await bcrypt.hash(password, salt);
 
-        userNew = await CreateLogin(req.body.email.toLowerCase(), encryptedPassword, req.body.moniker);
+        userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
 
         const token = jwt.sign(
             { user_id: userNew.id, email },
@@ -109,5 +115,5 @@ const { API_PORT } = process.env;
 const port = process.env.PORT || API_PORT;
 
 server.listen(port, () => {
-	  console.log(`Server running on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });
