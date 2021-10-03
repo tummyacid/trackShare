@@ -1,10 +1,12 @@
 var secrets = require('./secrets.json');
-const app = require("./app");
 const express = require('express');
+const http = require("http");
 
 const bcryptjs = require('bcryptjs');
-const jwt = require('jwt');
+const jwt = require('jsonwebtoken');
 const { Pool, Client } = require('pg')
+
+const app = express();
 
 const authDB = new Pool({
     user: secrets.DBuser,
@@ -14,11 +16,9 @@ const authDB = new Pool({
     port: secrets.DBport,
 });
 
+//add other middleware
 
-const app = express();
-
-// Register
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
     try {
         const { email, moniker, password } = req.body;
 
@@ -105,3 +105,12 @@ async function CreateLogin(emailAddress, password, moniker) {
         })
     })
 }
+
+const server = http.createServer(app);
+
+const { API_PORT } = process.env;
+const port = process.env.PORT || API_PORT;
+
+server.listen(port, () => {
+	  console.log(`Server running on port ${port}`);
+});
