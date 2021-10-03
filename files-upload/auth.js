@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool, Client } = require('pg')
 
+const app = express();
 app.use(express.json({limit: '20mb'}))
 app.use(express.urlencoded({ extended: false, limit: '20mb' }))
 
