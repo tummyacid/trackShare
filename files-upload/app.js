@@ -57,7 +57,7 @@ app.get("/api/viewTrack", (req, res) => {
 });
 	
 
-// upoad single file
+// upload single file
 app.post('/api/upload-gpxFile', async (req, res) => {
     try {
         if(!req.files) {
@@ -90,7 +90,7 @@ app.post('/api/upload-gpxFile', async (req, res) => {
     }
 });
 
-// upload multiple files
+// upload multiple files *not yet tested*
 app.post('/api/upload-gpxFiles', async (req, res) => {
     try {
         if(!req.files) {
@@ -116,7 +116,6 @@ app.post('/api/upload-gpxFiles', async (req, res) => {
                 });
             });
     
-            //return response
             res.send({
                 status: true,
 		mapId: persistResult,
@@ -128,9 +127,6 @@ app.post('/api/upload-gpxFiles', async (req, res) => {
         res.status(500).send(err);
     }
 });
-
-//make uploads directory static
-app.use(express.static('uploads'));
 
 async function persistGpxRequest(gpx, filename, source) {
 	const text = 'INSERT INTO track(gpx, created, filename, source) VALUES($1, NOW(), $2, $3) RETURNING id'
