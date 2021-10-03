@@ -36,27 +36,21 @@ app.post("/register", async (req, res) => {
             return res.status(409).send("User Already Exist.");
         }
 
-        bcrypt.genSalt(0x0365, function(err, salt) {
-            bcrypt.hash(password, salt, async function(err, hash) {
-                
-                userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
+        bcrypt.hash(password, 0x0365).then(encryptedPassword => {
 
-                const token = jwt.sign(
-                    { user_id: userNew.id, email },
-                    secrets.TokenKey,
-                    {
-                        expiresIn: "2h",
-                    }
-                );
-        
-                user.token = token;
-        
-                // return new user
-                res.status(201).json(user);
-            });
+            CreateLogin(email.toLowerCase(), encryptedPassword, moniker).then(userNew => {
+
+            const token = jwt.sign(
+                { user_id: userNew.id, email },
+                secrets.TokenKey,
+                {
+                    expiresIn: "2h",
+                }
+            );
+            user.token = token;
+            res.status(201).json(user);
         });
-
-
+    });
 
     } catch (err) {
         console.log(err);
