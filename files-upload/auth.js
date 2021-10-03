@@ -20,21 +20,15 @@ const authDB = new Pool({
 
 app.post("/register", async (req, res) => {
     try {
-        const { email, moniker, password } = req.body;
-
-        if (!(email && password)) {
-            res.status(400).send("All input is required");
-        }
-
-        userExists = await LookupByEmailAddress(email);
+        userExists = await LookupByEmailAddress(req.body.email);
 
         if (userExists) {
             return res.status(409).send("User Already Exist.");
         }
 
-        encryptedPassword = await bcrypt.hash(password, 10);
+        encryptedPassword = await bcrypt.hash(req.body.password, 10);
 
-        userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
+        userNew = await CreateLogin(req.body.email.toLowerCase(), encryptedPassword, req.body.moniker);
 
         const token = jwt.sign(
             { user_id: userNew.id, email },
