@@ -11,7 +11,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\files-upload\\index.js",
+            "program": "${workspaceFolder}\\files-upload\\auth.js",
             "env" : {
                 "API_PORT" : "3002"
             }
