@@ -34,6 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
+
 // retrieve track
 app.get("/api/viewTrack", (req, res) => {
     const text = 'SELECT gpx FROM track WHERE id = $1'
