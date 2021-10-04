@@ -32,7 +32,7 @@ app.use(morgan('dev'));
 
 
 // retrieve track
-app.get("/api/viewTrack", (req, res) => {
+app.get("/api/viewTrack", auth, (req, res) => {
     const text = 'SELECT gpx FROM track WHERE id = $1'
     const values = [req.query.id]
     client.connect(function (err, client, done) {
