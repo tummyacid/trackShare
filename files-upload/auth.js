@@ -39,14 +39,13 @@ app.post("/register", async (req, res) => {
         bcrypt.hash(password, 0x03).then( async function (err, encryptedPassword) {
             await CreateLogin(email.toLowerCase(), encryptedPassword, moniker).then(async function (err, userNew) {
                 const token = jwt.sign(
-                    { user_id: userNew.id, email },
+                    { user_id: userNew, email },
                     secrets.TokenKey,
                     {
                         expiresIn: "2h",
                     }
                 );
-                user.token = token;
-                res.status(201).json(user);
+                res.status(201).json(token);
             });
         });
     } catch (err) {
@@ -97,7 +96,7 @@ async function CreateLogin(emailAddress, password, moniker) {
             authDB.query(text, values)
                 .then(resPersist => {
                     done();
-                    resolve(resPersist.rows[0]); //TODO: check result
+                    resolve(resPersist.rows[0].id); //TODO: check result
                 })
                 .catch(errPersist => {
                     console.error(errPersist.stack);
