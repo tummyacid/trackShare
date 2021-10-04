@@ -38,17 +38,20 @@ app.post("/register", async (req, res) => {
 
         const cypher = await bcrypt.hash(password, 0x03);
 
-            await CreateLogin(email.toLowerCase(), cypher, moniker).then(async function (err, userNew) {
-                const token = jwt.sign(
-                    { user_id: userNew, email },
-                    secrets.TokenKey,
-                    {
-                        expiresIn: "2h",
-                    }
-                );
-                res.status(201).json(token);
-            });
-       
+        var userNew = await CreateLogin(email.toLowerCase(), cypher, moniker);
+
+        const token = jwt.sign(
+            { user_id: userNew, email },
+            secrets.TokenKey,
+            {
+                expiresIn: "2h",
+            }
+
+        );
+
+        await UpdateLogin(email, token);
+        res.status(201).json(token);
+
     } catch (err) {
         console.log(err);
     }
@@ -66,23 +69,23 @@ app.post("/login", async (req, res) => {
 
         userExists = await LookupByEmailAddress(email);
         console.log(userExists);
-        await bcrypt.compare(password, userExists.password).then((authed) => {
-		console.log("user authed: " + authed);
-            if (authed === true) {
-                const token = jwt.sign(
-                    { user_id: userExists.id, email },
-			secrets.TokenKey,
-                    {
-                        expiresIn: "2h",
-                    }
-                );
-                res.status(200).json(token);
-            }
-            else
-            {
-                res.status(409);
-            }
-        });
+        var authed = await bcrypt.compare(password, userExists.password);
+
+        console.log("user authed: " + authed);
+        if (authed === true) {
+            const token = jwt.sign(
+                { user_id: userExists.id, email },
+                secrets.TokenKey,
+                {
+                    expiresIn: "2h",
+                }
+            );
+            await UpdateLogin(email, token);
+            res.status(200).json(token);
+        }
+        else {
+            res.status(409);
+        }
     } catch (err) {
         console.log(err);
     }
@@ -126,6 +129,30 @@ async function CreateLogin(emailAddress, password, moniker) {
                 .then(resPersist => {
                     done();
                     resolve(resPersist.rows[0].id); //TODO: check result
+                })
+                .catch(errPersist => {
+                    console.error(errPersist.stack);
+                    reject(err);
+                })
+        })
+    })
+}
+
+
+async function UpdateLogin(emailAddress, token) {
+    const text = 'UPDATE login SET token = $1 WHERE email = $2'
+    const values = [token, emailAddress]
+    return new Promise(function (resolve, reject) {
+
+        authDB.connect(async function (err, client, done) {
+            if (err) {
+                console.log("Can not connect to the DB" + err);
+                reject(err);
+            }
+            authDB.query(text, values)
+                .then(resPersist => {
+                    done();
+                    resolve(); //TODO: check result
                 })
                 .catch(errPersist => {
                     console.error(errPersist.stack);
