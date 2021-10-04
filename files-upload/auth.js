@@ -36,21 +36,19 @@ app.post("/register", async (req, res) => {
             return res.status(409).send("User Already Exist.");
         }
 
-        bcrypt.hash(password, 0x0365, async function(err, encryptedPassword) {
-            userNew = await CreateLogin(email.toLowerCase(), encryptedPassword, moniker);
-            const token = jwt.sign(
-                { user_id: userNew.id, email },
-                secrets.TokenKey,
-                {
-                    expiresIn: "2h",
-                }
-            );
-            user.token = token;
-            res.status(201).json(user);
+        bcrypt.hash(password, 0x03, async function (err, encryptedPassword) {
+            CreateLogin(email.toLowerCase(), encryptedPassword, moniker, async function (err, userNew) {
+                const token = jwt.sign(
+                    { user_id: userNew.id, email },
+                    secrets.TokenKey,
+                    {
+                        expiresIn: "2h",
+                    }
+                );
+                user.token = token;
+                res.status(201).json(user);
+            });
         });
-
-
-
     } catch (err) {
         console.log(err);
     }
