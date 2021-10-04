@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: false, limit: '20mb' }))
 app.use(cors());
 app.use(morgan('dev'));
 
-app.get("/api/viewTrack", auth, (req, res) => {
+app.get("/api/viewTrack", (req, res) => {
     const text = 'SELECT gpx FROM track WHERE id = $1'
     const values = [req.query.id]
     client.connect(function (err, client, done) {
@@ -165,13 +165,11 @@ app.post("/api/login", async (req, res) => {
         }
 
         userExists = await LookupByEmailAddress(email);
-        console.log(userExists);
         var authed = await bcrypt.compare(password, userExists.password);
-
-        console.log("user authed: " + authed);
+        
         if (authed === true) {
             const token = jwt.sign(
-                { user_id: userExists.id, email },
+                { id: userExists.id, email },
                 secrets.TokenKey,
                 {
                     expiresIn: "2h",
