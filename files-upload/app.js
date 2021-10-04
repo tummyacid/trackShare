@@ -3,7 +3,6 @@ var auth = require('./auth');
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const { Pool, Client } = require('pg')
 const bcrypt = require('bcryptjs');
@@ -20,7 +19,6 @@ const client = new Pool({
 });
 const app = express();
 app.use(fileUpload({
-    createParentPath: true,
     limits: {
         fileSize: 20 * 1024 * 1024 * 1024 //20MB max file(s) size
     },
@@ -30,8 +28,6 @@ app.use(express.urlencoded({ extended: false, limit: '20mb' }))
 app.use(cors());
 app.use(morgan('dev'));
 
-
-// retrieve track
 app.get("/api/viewTrack", auth, (req, res) => {
     const text = 'SELECT gpx FROM track WHERE id = $1'
     const values = [req.query.id]
@@ -53,8 +49,6 @@ app.get("/api/viewTrack", auth, (req, res) => {
     })
 });
 
-
-// upload single file
 app.post('/api/upload-gpxFile', async (req, res) => {
     try {
         if (!req.files) {
@@ -70,7 +64,6 @@ app.post('/api/upload-gpxFile', async (req, res) => {
                 null;
 
             persistResult = await persistGpxRequest(gpxFile.data, gpxFile.name, ip);
-            //send response
             res.send({
                 status: true,
                 trackId: persistResult,
@@ -83,6 +76,7 @@ app.post('/api/upload-gpxFile', async (req, res) => {
             });
         }
     } catch (err) {
+        console.log(err);      
         res.status(500).send(err);
     }
 });
@@ -121,11 +115,12 @@ app.post('/api/upload-gpxFiles', async (req, res) => {
             });
         }
     } catch (err) {
+        console.log(err);      
         res.status(500).send(err);
     }
 });
 
-app.post("/register", async (req, res) => {
+app.post("/api/register", async (req, res) => {
     try {
         email = req.body.email;
         password = req.body.password;
@@ -134,37 +129,35 @@ app.post("/register", async (req, res) => {
         if (!(email && password)) {
             res.status(400).send("email and password required");
         }
-
         userExists = await LookupByEmailAddress(email);
 
         if (userExists) {
             return res.status(409).send("User Already Exist.");
         }
-
         const cypher = await bcrypt.hash(password, 0x03);
 
         var userNew = await CreateLogin(email.toLowerCase(), cypher, moniker);
 
         const token = jwt.sign(
-            { user_id: userNew, email },
+            { id: userNew, email },
             secrets.TokenKey,
             {
                 expiresIn: "2h",
             }
-
         );
 
         await UpdateLogin(email, token);
         res.status(201).json(token);
 
     } catch (err) {
-        console.log(err);
+        console.log(err);        
+        res.status(500).send(err);
     }
 
 });
 
 // Login
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!(email && password)) {
@@ -194,23 +187,6 @@ app.post("/login", async (req, res) => {
         console.log(err);
     }
 });
-
-const verifyToken = (req, res, next) => {
-    const token =
-        req.body.token || req.query.token || req.headers["x-access-token"];
-
-    if (!token) {
-        return res.status(403).send("A token is required for authentication");
-    }
-    try {
-        const decoded = jwt.verify(token, secrets.TokenKey);
-        console.log(decoded);
-        req.user = decoded;
-    } catch (err) {
-        return res.status(401).send("Invalid Token");
-    }
-    return next();
-};
 
 async function LookupByEmailAddress(emailAddress) {
     const text = 'SELECT * FROM login WHERE email = $1'
@@ -282,9 +258,6 @@ async function UpdateLogin(emailAddress, token) {
         })
     })
 }
-
-
-module.exports = verifyToken;
 
 async function persistGpxRequest(gpx, filename, source) {
     const text = 'INSERT INTO track(gpx, created, filename, source) VALUES($1, NOW(), $2, $3) RETURNING id'
