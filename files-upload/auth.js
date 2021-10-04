@@ -36,8 +36,9 @@ app.post("/register", async (req, res) => {
             return res.status(409).send("User Already Exist.");
         }
 
-        bcrypt.hash(password, 0x03).then(async function (err, encryptedPassword) {
-            await CreateLogin(email.toLowerCase(), encryptedPassword, moniker).then(async function (err, userNew) {
+        const cypher = await bcrypt.hash(password, 0x03);
+
+            await CreateLogin(email.toLowerCase(), cypher, moniker).then(async function (err, userNew) {
                 const token = jwt.sign(
                     { user_id: userNew, email },
                     secrets.TokenKey,
@@ -47,7 +48,7 @@ app.post("/register", async (req, res) => {
                 );
                 res.status(201).json(token);
             });
-        });
+       
     } catch (err) {
         console.log(err);
     }
@@ -65,11 +66,12 @@ app.post("/login", async (req, res) => {
 
         userExists = await LookupByEmailAddress(email);
         console.log(userExists);
-        bcrypt.compare(password, userExists.password).then((authed) => {
+        await bcrypt.compare(password, userExists.password).then((authed) => {
+		console.log("user authed: " + authed);
             if (authed === true) {
                 const token = jwt.sign(
-                    { user_id: user._id, email },
-                    process.env.TOKEN_KEY,
+                    { user_id: userExists.id, email },
+			secrets.TokenKey,
                     {
                         expiresIn: "2h",
                     }
@@ -111,7 +113,7 @@ async function LookupByEmailAddress(emailAddress) {
 
 
 async function CreateLogin(emailAddress, password, moniker) {
-    const text = 'INSERT INTO login(email, created, moniker, password) VALUES($1, NOW(), $2, $3) RETURNING id'
+    const text = 'INSERT INTO login(email, created, password, moniker) VALUES($1, NOW(), $2, $3) RETURNING id'
     const values = [emailAddress, password, moniker]
     return new Promise(function (resolve, reject) {
 
