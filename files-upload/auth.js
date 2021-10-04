@@ -18,8 +18,6 @@ const authDB = new Pool({
     port: secrets.DBport,
 });
 
-//add other middleware
-
 app.post("/register", async (req, res) => {
     try {
         email = req.body.email;
@@ -27,7 +25,7 @@ app.post("/register", async (req, res) => {
         moniker = req.body.moniker;
 
         if (!(email && password)) {
-            res.status(400).send("All input is required");
+            res.status(400).send("email and password required");
         }
 
         userExists = await LookupByEmailAddress(email);
@@ -61,10 +59,9 @@ app.post("/register", async (req, res) => {
 // Login
 app.post("/login", async (req, res) => {
     try {
-        // Get user input
         const { email, password } = req.body;
         if (!(email && password)) {
-            res.status(400).send("All input is required");
+            res.status(400).send("email and password required");
         }
 
         userExists = await LookupByEmailAddress(email);
@@ -161,6 +158,24 @@ async function UpdateLogin(emailAddress, token) {
         })
     })
 }
+
+const verifyToken = (req, res, next) => {
+    const token =
+        req.body.token || req.query.token || req.headers["x-access-token"];
+
+    if (!token) {
+        return res.status(403).send("A token is required for authentication");
+    }
+    try {
+        const decoded = jwt.verify(token, config.TOKEN_KEY);
+        req.user = decoded;
+    } catch (err) {
+        return res.status(401).send("Invalid Token");
+    }
+    return next();
+};
+
+module.exports = verifyToken;
 
 const server = http.createServer(app);
 
