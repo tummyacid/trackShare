@@ -1,16 +1,16 @@
 var secrets = require('./secrets.json');
+var auth = require('./auth');
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const { Pool, Client } = require('pg')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
-const app = express();
 
-// pools will use environment variables
-// for connection information
 const client = new Pool({
     user: secrets.DBuser,
     host: secrets.DBhost,
@@ -18,20 +18,16 @@ const client = new Pool({
     password: secrets.DBpassword,
     port: secrets.DBport,
 });
-
-
-// enable files upload
+const app = express();
 app.use(fileUpload({
     createParentPath: true,
     limits: {
         fileSize: 20 * 1024 * 1024 * 1024 //20MB max file(s) size
     },
 }));
-
-//add other middleware
+app.use(express.json({ limit: '20mb' }))
+app.use(express.urlencoded({ extended: false, limit: '20mb' }))
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 
