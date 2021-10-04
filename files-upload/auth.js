@@ -37,7 +37,7 @@ app.post("/register", async (req, res) => {
         }
 
         bcrypt.hash(password, 0x03, async function (err, encryptedPassword) {
-            await CreateLogin(email.toLowerCase(), encryptedPassword, moniker, function (err, userNew) {
+            await CreateLogin(email.toLowerCase(), encryptedPassword, moniker, async function (err, userNew) {
                 const token = jwt.sign(
                     { user_id: userNew.id, email },
                     secrets.TokenKey,
