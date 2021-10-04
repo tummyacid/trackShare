@@ -36,7 +36,7 @@ app.post("/register", async (req, res) => {
             return res.status(409).send("User Already Exist.");
         }
 
-        bcrypt.hash(password, 0x03).then( async function (err, encryptedPassword) {
+        bcrypt.hash(password, 0x03).then(async function (err, encryptedPassword) {
             await CreateLogin(email.toLowerCase(), encryptedPassword, moniker).then(async function (err, userNew) {
                 const token = jwt.sign(
                     { user_id: userNew, email },
@@ -55,8 +55,35 @@ app.post("/register", async (req, res) => {
 });
 
 // Login
-app.post("/login", (req, res) => {
-    // our login logic goes here
+app.post("/login", async (req, res) => {
+    try {
+        // Get user input
+        const { email, password } = req.body;
+        if (!(email && password)) {
+            res.status(400).send("All input is required");
+        }
+
+        userExists = await LookupByEmailAddress(email);
+        console.log(userExists);
+        bcrypt.compare(password, userExists.password).then((authed) => {
+            if (authed === true) {
+                const token = jwt.sign(
+                    { user_id: user._id, email },
+                    process.env.TOKEN_KEY,
+                    {
+                        expiresIn: "2h",
+                    }
+                );
+                res.status(200).json(token);
+            }
+            else
+            {
+                res.status(409);
+            }
+        });
+    } catch (err) {
+        console.log(err);
+    }
 });
 
 async function LookupByEmailAddress(emailAddress) {
