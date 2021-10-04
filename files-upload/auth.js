@@ -36,8 +36,8 @@ app.post("/register", async (req, res) => {
             return res.status(409).send("User Already Exist.");
         }
 
-        bcrypt.hash(password, 0x03, function (err, encryptedPassword) {
-            CreateLogin(email.toLowerCase(), encryptedPassword, moniker, function (err, userNew) {
+        bcrypt.hash(password, 0x03, async function (err, encryptedPassword) {
+            await CreateLogin(email.toLowerCase(), encryptedPassword, moniker, function (err, userNew) {
                 const token = jwt.sign(
                     { user_id: userNew.id, email },
                     secrets.TokenKey,
