@@ -17,6 +17,7 @@ def send_location(token):
     packet = gpsd.get_current()
 
     url = "https://watertower.tummyacid.net/api/gpsPosition"
+
     geometry = {
         "geometry":
         {
@@ -29,15 +30,12 @@ def send_location(token):
         "x-access-token": token
     }
 
-    print(myHeaders)
-
     x = requests.post(url, json=geometry, headers=myHeaders)
     return x.status_code == 200
 
 authToken = ""
 while True:
-    print("Getting new token")
-    newToken = get_newToken()
+    authToken = get_newToken()
     while (send_location(authToken)):
         time.sleep(10)
 
