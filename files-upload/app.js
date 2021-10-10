@@ -330,7 +330,7 @@ async function UpdatePosition(userId, geometry) {
             client.query(text, values)
                 .then(resPersist => {
                     done();
-                    resolve(); //TODO: check result
+                    resolve(resPersist); //TODO: check result
                 })
                 .catch(errPersist => {
                     console.error(errPersist.stack);
