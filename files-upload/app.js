@@ -186,6 +186,27 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
+app.post('/api/gpsPosition', auth, async (req, res) => {
+    try {
+        if (!req.body.trkpt) {
+            res.send({
+                status: false,
+                message: 'No trkpt uploaded'
+            });
+        } else {
+            persistResult = await UpdatePosition(req.body.login, req.body.lat, req.body.lon);
+            res.send({
+                status: true,
+                trackId: persistResult,
+                message: "Position Updated"
+            });
+        }
+    } catch (err) {
+        console.log(err);      
+        res.status(500).send(err);
+    }
+});
+
 async function LookupByEmailAddress(emailAddress) {
     const text = 'SELECT * FROM login WHERE email = $1'
     const values = [emailAddress]
@@ -236,6 +257,29 @@ async function CreateLogin(emailAddress, password, moniker) {
 
 async function UpdateLogin(emailAddress, token) {
     const text = 'UPDATE login SET token = $1 WHERE email = $2'
+    const values = [token, emailAddress]
+    return new Promise(function (resolve, reject) {
+
+        client.connect(async function (err, client, done) {
+            if (err) {
+                console.log("Can not connect to the DB" + err);
+                reject(err);
+            }
+            client.query(text, values)
+                .then(resPersist => {
+                    done();
+                    resolve(); //TODO: check result
+                })
+                .catch(errPersist => {
+                    console.error(errPersist.stack);
+                    reject(err);
+                })
+        })
+    })
+}
+
+async function UpdatePosition(userId, lat, lon) {
+    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), ${userId}, 0, ST_GeomFromText(POINT(${lon} ${lat}),4269)) RETURNING id;`
     const values = [token, emailAddress]
     return new Promise(function (resolve, reject) {
 
