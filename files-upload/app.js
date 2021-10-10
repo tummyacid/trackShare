@@ -191,13 +191,13 @@ app.post('/api/gpsPosition', auth, async (req, res) => {
         if (!req.body.geometry) {
             res.send({
                 status: false,
-                message: 'No lat uploaded'
+                message: 'No geometry uploaded'
             });
         } else {
             persistResult = await UpdatePosition(req.body.login, req.body.geometry);
             res.send({
                 status: true,
-                trackId: persistResult,
+                positionId: persistResult,
                 message: "Position Updated"
             });
         }
@@ -206,6 +206,22 @@ app.post('/api/gpsPosition', auth, async (req, res) => {
         res.status(500).send(err);
     }
 });
+
+app.get('/api/getPosition', auth, async (req, res) => {
+    try {
+            persistResult = await GetLatestPosition(req.body.login.id);
+            res.send({
+                status: true,
+                positionId: persistResult,
+                message: "Position Updated"
+            });
+        
+         } catch (err) {
+        console.log(err);      
+        res.status(500).send(err);
+    }
+});
+
 
 async function LookupByEmailAddress(emailAddress) {
     const text = 'SELECT * FROM login WHERE email = $1'
@@ -277,7 +293,30 @@ async function UpdateLogin(emailAddress, token) {
         })
     })
 }
+async function GetLatestPosition(userId)
+{
+    const text = `SELECT position FROM usrtrack WHERE loginId = $1 ORDER BY created DESC LIMIT 1;`
+    const values = [userId]  
 
+    return new Promise(function (resolve, reject) {
+
+        client.connect(async function (err, client, done) {
+            if (err) {
+                console.log("Can not connect to the DB" + err);
+                reject(err);
+            }
+            client.query(text, values)
+                .then(resPersist => {
+                    done();
+                    resolve(resPersist.rows[0]); //TODO: check result
+                })
+                .catch(errPersist => {
+                    console.error(errPersist.stack);
+                    reject(err);
+                })
+        })
+    })
+}
 async function UpdatePosition(userId, geometry) {
     const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), $1, 0, ST_GeomFromGeoJSON($2)) RETURNING id;`
     const values = [userId, geometry]
