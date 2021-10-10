@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: false, limit: '20mb' }))
 app.use(cors());
 app.use(morgan('dev'));
 
-app.get("/api/viewTrack", (req, res) => {
+app.get("/viewTrack", (req, res) => {
     const text = 'SELECT gpx FROM track WHERE id = $1'
     const values = [req.query.id]
     client.connect(function (err, client, done) {
@@ -49,7 +49,7 @@ app.get("/api/viewTrack", (req, res) => {
     })
 });
 
-app.post('/api/upload-gpxFile', async (req, res) => {
+app.post('/upload-gpxFile', async (req, res) => {
     try {
         if (!req.files) {
             res.send({
@@ -82,7 +82,7 @@ app.post('/api/upload-gpxFile', async (req, res) => {
 });
 
 // upload multiple files *not yet tested*
-app.post('/api/upload-gpxFiles', async (req, res) => {
+app.post('/upload-gpxFiles', async (req, res) => {
     try {
         if (!req.files) {
             res.send({
@@ -120,7 +120,7 @@ app.post('/api/upload-gpxFiles', async (req, res) => {
     }
 });
 
-app.post("/api/register", async (req, res) => {
+app.post("/register", async (req, res) => {
     try {
         email = req.body.email;
         password = req.body.password;
@@ -157,7 +157,7 @@ app.post("/api/register", async (req, res) => {
 });
 
 // Login
-app.post("/api/login", async (req, res) => {
+app.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!(email && password)) {
@@ -186,7 +186,7 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-app.post('/api/gpsPosition', auth, async (req, res) => {
+app.post('/gpsPosition', auth, async (req, res) => {
     try {
         if (!req.body.geometry) {
             res.send({
@@ -207,7 +207,7 @@ app.post('/api/gpsPosition', auth, async (req, res) => {
     }
 });
 
-app.get('/api/gpsPosition', auth, async (req, res) => {
+app.get('/gpsPosition', auth, async (req, res) => {
     try {
             persistResult = await GetLatestPosition(req.login.id);
             console.log(persistResult);
