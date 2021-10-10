@@ -279,8 +279,8 @@ async function UpdateLogin(emailAddress, token) {
 }
 
 async function UpdatePosition(userId, lat, lon) {
-    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), ${userId}, 0, ST_GeomFromText(POINT(${lon} ${lat}),4269)) RETURNING id;`
-    const values = [token, emailAddress]
+    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), $1, 0, 'ST_GeomFromText(POINT($2 $3),4269)') RETURNING id;`
+    const values = [userId, lon, lat]
     return new Promise(function (resolve, reject) {
 
         client.connect(async function (err, client, done) {
