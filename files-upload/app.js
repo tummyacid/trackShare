@@ -172,7 +172,7 @@ app.post("/login", async (req, res) => {
                 { id: userExists.id, email },
                 secrets.TokenKey,
                 {
-                    expiresIn: "2h",
+                    expiresIn: "1m",
                 }
             );
             await UpdateLogin(email, token);
