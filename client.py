@@ -1,5 +1,6 @@
 import gpsd
 import requests
+import time
 
 def get_newToken():
     url = "https://watertower.tummyacid.net/api/login"
@@ -8,10 +9,8 @@ def get_newToken():
     "moniker": "test3",
     "password": "test2"
     }
-
     x = requests.post(url, json=userData)
-    print(x)
-
+    return x.text.strip('"')
 
 def send_location(token):
     gpsd.connect()
@@ -30,7 +29,15 @@ def send_location(token):
         "x-access-token": token
     }
 
-    x = requests.post(url, json=geometry, headers=myHeaders)
-    print(x)
+    print(myHeaders)
 
-send_location("")
+    x = requests.post(url, json=geometry, headers=myHeaders)
+    return x.status_code == 200
+
+authToken = ""
+while True:
+    print("Getting new token")
+    newToken = get_newToken()
+    while (send_location(authToken)):
+        time.sleep(10)
+
