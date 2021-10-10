@@ -211,10 +211,7 @@ app.get('/gpsPosition', auth, async (req, res) => {
     try {
             persistResult = await GetLatestPosition(req.login.id);
             console.log(persistResult);
-            res.send({
-                status: true,
-                message: persistResult
-            });
+            res.send(persistResult);
         
          } catch (err) {
         console.log(err);      
