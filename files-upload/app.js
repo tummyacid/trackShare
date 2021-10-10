@@ -188,10 +188,10 @@ app.post("/api/login", async (req, res) => {
 
 app.post('/api/gpsPosition', auth, async (req, res) => {
     try {
-        if (!req.body.trkpt) {
+        if (!req.body.lat) {
             res.send({
                 status: false,
-                message: 'No trkpt uploaded'
+                message: 'No lat uploaded'
             });
         } else {
             persistResult = await UpdatePosition(req.body.login, req.body.lat, req.body.lon);
