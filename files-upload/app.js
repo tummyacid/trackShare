@@ -207,13 +207,13 @@ app.post('/api/gpsPosition', auth, async (req, res) => {
     }
 });
 
-app.get('/api/getPosition', auth, async (req, res) => {
+app.get('/api/gpsPosition', auth, async (req, res) => {
     try {
-            persistResult = await GetLatestPosition(req.body.login.id);
+            persistResult = await GetLatestPosition(req.login.id);
+            console.log(gpsPosition);
             res.send({
                 status: true,
-                positionId: persistResult,
-                message: "Position Updated"
+                message: gpsPosition
             });
         
          } catch (err) {
