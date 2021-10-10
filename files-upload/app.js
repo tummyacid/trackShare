@@ -338,7 +338,7 @@ async function UpdatePosition(userId, geometry) {
 }
 
 async function persistGpxRequest(gpx, filename, source) {
-    const text = 'INSERT INTO track(gpx, created, filename, source) VALUES($1, NOW(), $2, $3) RETURNING id'
+    const text = 'INSERT INTO track(gpx, created, filename, source, permission) VALUES($1, NOW(), $2, $3, 0) RETURNING id'
     const values = [gpx, filename, source]
 
     return new Promise(function (resolve, reject) {
