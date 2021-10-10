@@ -12,8 +12,8 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\files-upload\\index.js",
-            "env": {
-                "PORT": "3002"
+            "env" : {
+                "API_PORT" : "3002"
             }
         }
     ]
