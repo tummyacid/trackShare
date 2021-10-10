@@ -194,7 +194,7 @@ app.post('/api/gpsPosition', auth, async (req, res) => {
                 message: 'No geometry uploaded'
             });
         } else {
-            persistResult = await UpdatePosition(req.body.login, req.body.geometry);
+            persistResult = await UpdatePosition(req.login.id, req.body.geometry);
             res.send({
                 status: true,
                 positionId: persistResult,
@@ -210,10 +210,10 @@ app.post('/api/gpsPosition', auth, async (req, res) => {
 app.get('/api/gpsPosition', auth, async (req, res) => {
     try {
             persistResult = await GetLatestPosition(req.login.id);
-            console.log(gpsPosition);
+            console.log(persistResult);
             res.send({
                 status: true,
-                message: gpsPosition
+                message: persistResult
             });
         
          } catch (err) {
