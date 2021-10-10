@@ -279,7 +279,7 @@ async function UpdateLogin(emailAddress, token) {
 }
 
 async function UpdatePosition(userId, geometry) {
-    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), $1, 0, ST_GeomFromJSON($2,4269)) RETURNING id;`
+    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), $1, 0, ST_GeomFromGeoJSON($2)) RETURNING id;`
     const values = [userId, geometry]
     return new Promise(function (resolve, reject) {
 
