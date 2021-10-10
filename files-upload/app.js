@@ -76,7 +76,7 @@ app.post('/upload-gpxFile', async (req, res) => {
             });
         }
     } catch (err) {
-        console.log(err);      
+        console.log(err);
         res.status(500).send(err);
     }
 });
@@ -115,7 +115,7 @@ app.post('/upload-gpxFiles', async (req, res) => {
             });
         }
     } catch (err) {
-        console.log(err);      
+        console.log(err);
         res.status(500).send(err);
     }
 });
@@ -150,7 +150,7 @@ app.post("/register", async (req, res) => {
         res.status(201).json(token);
 
     } catch (err) {
-        console.log(err);        
+        console.log(err);
         res.status(500).send(err);
     }
 
@@ -166,7 +166,7 @@ app.post("/login", async (req, res) => {
 
         userExists = await LookupByEmailAddress(email);
         var authed = await bcrypt.compare(password, userExists.password);
-        
+
         if (authed === true) {
             const token = jwt.sign(
                 { id: userExists.id, email },
@@ -202,19 +202,19 @@ app.post('/gpsPosition', auth, async (req, res) => {
             });
         }
     } catch (err) {
-        console.log(err);      
+        console.log(err);
         res.status(500).send(err);
     }
 });
 
 app.get('/gpsPosition', auth, async (req, res) => {
     try {
-            persistResult = await GetLatestPosition(req.login.id);
-            console.log(persistResult);
-            res.send(persistResult);
-        
-         } catch (err) {
-        console.log(err);      
+        persistResult = await GetLatestPosition(req.login.id);
+        console.log(persistResult);
+        res.send(persistResult);
+
+    } catch (err) {
+        console.log(err);
         res.status(500).send(err);
     }
 });
@@ -290,10 +290,9 @@ async function UpdateLogin(emailAddress, token) {
         })
     })
 }
-async function GetLatestPosition(userId)
-{
+async function GetLatestPosition(userId) {
     const text = `SELECT  ST_X(position), ST_Y(position) FROM usrtrack WHERE loginId = $1 ORDER BY created DESC LIMIT 1;`
-    const values = [userId]  
+    const values = [userId]
 
     return new Promise(function (resolve, reject) {
 
