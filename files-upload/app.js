@@ -188,13 +188,13 @@ app.post("/api/login", async (req, res) => {
 
 app.post('/api/gpsPosition', auth, async (req, res) => {
     try {
-        if (!req.body.lat) {
+        if (!req.body.geometry) {
             res.send({
                 status: false,
                 message: 'No lat uploaded'
             });
         } else {
-            persistResult = await UpdatePosition(req.body.login, req.body.lat, req.body.lon);
+            persistResult = await UpdatePosition(req.body.login, req.body.geometry);
             res.send({
                 status: true,
                 trackId: persistResult,
@@ -278,9 +278,9 @@ async function UpdateLogin(emailAddress, token) {
     })
 }
 
-async function UpdatePosition(userId, lat, lon) {
-    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), $1, 0, 'ST_GeomFromText(POINT($2 $3),4269)') RETURNING id;`
-    const values = [userId, lon, lat]
+async function UpdatePosition(userId, geometry) {
+    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), $1, 0, ST_GeomFromJSON($2,4269)) RETURNING id;`
+    const values = [userId, geometry]
     return new Promise(function (resolve, reject) {
 
         client.connect(async function (err, client, done) {
