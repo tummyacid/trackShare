@@ -295,7 +295,7 @@ async function UpdateLogin(emailAddress, token) {
 }
 async function GetLatestPosition(userId)
 {
-    const text = `SELECT position FROM usrtrack WHERE loginId = $1 ORDER BY created DESC LIMIT 1;`
+    const text = `SELECT ST_AsText(position) FROM usrtrack WHERE loginId = $1 ORDER BY created DESC LIMIT 1;`
     const values = [userId]  
 
     return new Promise(function (resolve, reject) {
