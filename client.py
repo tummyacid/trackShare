@@ -15,6 +15,10 @@ def get_newToken():
 def send_location(token):
     packet = gpsd.get_current()
 
+    while (packet.mode < 2):
+        time.sleep(10)
+        packet = gpsd.get_current()
+
     url = "https://watertower.tummyacid.net/api/gpsPosition"
 
     geometry = {
