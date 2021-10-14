@@ -322,7 +322,7 @@ async function GetLatestPosition(userId) {
     })
 }
 async function UpdatePosition(userId, geometry, createdTime) {
-    const text = `INSERT INTO usrTrack(logged, created, loginid, permission, position) VALUES (NOW(), $1, $2, 0, ST_GeomFromGeoJSON($3)) RETURNING id;`
+    const text = `INSERT INTO usrTrack(logged, created, loginid, permission, position) VALUES (NOW(), to_timestamp($1, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'), $2, 0, ST_GeomFromGeoJSON($3)) RETURNING id;`
     const values = [createdTime, userId, geometry]
     return new Promise(function (resolve, reject) {
 
