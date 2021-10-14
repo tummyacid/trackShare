@@ -10,7 +10,7 @@ def get_newToken():
     "password": "test2"
     }
     r = requests.post(url, json=userData)
-    xheader = r.json
+    xheader = r.json()
     return xheader["x-access-token"]
 
 def send_location(token):
@@ -43,6 +43,9 @@ while True:
     if (resp == 200):
         pass
     if (resp == 401):
+        authToken = get_newToken()
+        resp = send_location(authToken)
+    if (resp == 403):
         authToken = get_newToken()
         resp = send_location(authToken)
     time.sleep(10)
