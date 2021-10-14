@@ -202,7 +202,7 @@ app.post('/gpsPosition', auth, async (req, res) => {
                 message: 'No geometry uploaded'
             });
         } else {
-            persistResult = await UpdatePosition(req.login.id, req.body.geometry);
+            persistResult = await UpdatePosition(req.login.id, req.body.geometry, req.body.timestamp);
             res.send({
                 status: true,
                 positionId: persistResult,
@@ -321,9 +321,9 @@ async function GetLatestPosition(userId) {
         })
     })
 }
-async function UpdatePosition(userId, geometry) {
-    const text = `INSERT INTO usrTrack(created, loginid, permission, position) VALUES (NOW(), $1, 0, ST_GeomFromGeoJSON($2)) RETURNING id;`
-    const values = [userId, geometry]
+async function UpdatePosition(userId, geometry, createdTime) {
+    const text = `INSERT INTO usrTrack(logged, created, loginid, permission, position) VALUES (NOW(), $1, $2, 0, ST_GeomFromGeoJSON($3)) RETURNING id;`
+    const values = [createdTime, userId, geometry]
     return new Promise(function (resolve, reject) {
 
         client.connect(async function (err, client, done) {
