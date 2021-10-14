@@ -6,7 +6,6 @@ def get_newToken():
     url = "https://watertower.tummyacid.net/api/login"
     userData = {
     "email": "test3",
-    "moniker": "test3",
     "password": "test2"
     }
     r = requests.post(url, json=userData)
@@ -26,7 +25,8 @@ def send_location(token):
         {
             "type": "Point",
             "coordinates": [packet.lon, packet.lat]
-        }
+        },
+        "timestamp" : packet.time
     }
 
     myHeaders = {
