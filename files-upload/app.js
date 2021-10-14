@@ -147,7 +147,11 @@ app.post("/register", async (req, res) => {
         );
 
         await UpdateLogin(email, token);
-        res.status(201).json(token);
+        res.status(201).json(
+            {
+                "x-access-token" : token
+            }      
+        );
 
     } catch (err) {
         console.log(err);
@@ -176,7 +180,11 @@ app.post("/login", async (req, res) => {
                 }
             );
             await UpdateLogin(email, token);
-            res.status(200).json(token);
+            res.status(200).json(
+                {
+                    "x-access-token" : token
+                }               
+            );
         }
         else {
             res.status(409);

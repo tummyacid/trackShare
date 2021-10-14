@@ -9,8 +9,9 @@ def get_newToken():
     "moniker": "test3",
     "password": "test2"
     }
-    x = requests.post(url, json=userData)
-    return x.text.strip('"')
+    r = requests.post(url, json=userData)
+    xheader = r.json
+    return xheader["x-access-token"]
 
 def send_location(token):
     packet = gpsd.get_current()
