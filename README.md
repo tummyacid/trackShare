@@ -1,6 +1,6 @@
-# GPX upload modules
+# trekShare
 
-Harvest GPX file from participants for further testing
+GIS backend to share and update in real-time
 
 # Api
 
@@ -10,7 +10,9 @@ two functions currently supported:
 
 ## GPX track upload and view
 
-Allows web browsers to upload and retrieve GPX files. These are stored in  postgresql and can be viewed by anyone with the link.
+Allows anonymous web browsers to upload and retrieve GPX files. These are stored in postgresql and can be viewed by anyone with the link.
+
+[Demonstration here](https://fall.tummyacid.net/)
 
 ## Live asset positioning
 
