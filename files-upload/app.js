@@ -34,17 +34,21 @@ app.get("/viewTrack", (req, res) => {
     client.connect(function (err, client, done) {
         if (err) {
             console.log("Can not connect to the DB" + err);
+            res.status(500).send(err);
         }
         client
-            .query(text, values, function (err, resTrack) {
+            .query(text, values, function (errTrack, resTrack) {
                 done();
                 if (err) {
-                    console.log(err);
-                    res.status(400).send(err);
+                    console.log(errTrack);
+                    res.status(400).send(errTrack);
                 }
-                res.writeHead(200, { 'Content-Type': 'application/xml' });
-                res.write(resTrack.rows[0].gpx);
-                return res.end();
+                if (resTrack.rowCount > 0) {
+                    res.writeHead(200, { 'Content-Type': 'application/xml' });
+                    res.write(resTrack.rows[0].gpx);
+                    return res.end();
+                }
+                else { res.status(403).send(req.query.id + " not found"); }
             })
     })
 });
@@ -149,8 +153,8 @@ app.post("/register", async (req, res) => {
         await UpdateLogin(email, token);
         res.status(201).json(
             {
-                "x-access-token" : token
-            }      
+                "x-access-token": token
+            }
         );
 
     } catch (err) {
@@ -182,8 +186,8 @@ app.post("/login", async (req, res) => {
             await UpdateLogin(email, token);
             res.status(200).json(
                 {
-                    "x-access-token" : token
-                }               
+                    "x-access-token": token
+                }
             );
         }
         else {
