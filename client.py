@@ -2,15 +2,18 @@ import gpsd
 import requests
 import time
 
-def get_newToken():
+def get_token():
     url = "https://watertower.tummyacid.net/api/login"
     userData = {
     "email": "test3",
     "password": "test2"
     }
-    r = requests.post(url, json=userData)
-    xheader = r.json()
-    return xheader["x-access-token"]
+    try:
+        r = requests.post(url, json=userData)
+        xheader = r.json()
+        return xheader["x-access-token"]
+    except:
+        return ""
 
 def send_location(token):
     packet = gpsd.get_current()
@@ -18,9 +21,7 @@ def send_location(token):
         time.sleep(10)# wait for GPS location lock
         packet = gpsd.get_current()
 
-    url = "https://watertower.tummyacid.net/api/gpsPosition"
-
-    geometry = {
+    position = {
         "geometry":
         {
             "type": "Point",
@@ -29,12 +30,15 @@ def send_location(token):
         "timestamp" : packet.time
     }
 
-    myHeaders = {
+    authHeaders = {
         "x-access-token": token
     }
 
-    x = requests.post(url, json=geometry, headers=myHeaders)
-    return x.status_code
+    try:
+        x = requests.post('https://watertower.tummyacid.net/api/gpsPosition', json=position, headers=authHeaders)
+        return x.status_code
+    except:
+        return 0
 
 gpsd.connect()
 authToken = ""
@@ -43,10 +47,10 @@ while True:
     if (resp == 200):
         pass
     if (resp == 401):
-        authToken = get_newToken()
-        resp = send_location(authToken)
-    if (resp == 403):
-        authToken = get_newToken()
-        resp = send_location(authToken)
+        authToken = get_token()
+        if (authToken != ""):
+            resp = send_location(authToken)
+    if (resp == 0):
+        print("host is down")
     time.sleep(10)
 
