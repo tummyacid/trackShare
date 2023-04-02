@@ -12,7 +12,7 @@ two functions currently supported:
 
 Allows anonymous web browsers to upload and retrieve GPX files. These are stored in postgresql and can be viewed by anyone with the link.
 
-[Demonstration here](https://fall.tummyacid.net/)
+[Demonstration here](https://watertower.tummyacid.net/mapView.html)
 
 ## Live asset positioning
 
