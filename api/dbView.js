@@ -40,10 +40,24 @@ app.get("/api/viewTrack", (req, res) => {
 		if (err) {
 			console.log(err);
 			res.status(400).send(err);
+            res.end();
 		}
-			res.writeHead(200, {'Content-Type': 'application/xml'});
-			res.write(resTrack.rows[0].gpx);
-			return res.end();
+        if (req.accepts('json'))
+        {       
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            xml2js.parseString(resTrack.rows[0].gpx, (err, result) => {
+                if (err) {
+                    throw err
+                }
+                const json = JSON.stringify(result, null, 4)
+                res.send(json)
+                return res.end();
+                })
+        }
+
+        res.writeHead(200, {'Content-Type': 'application/xml'});
+        res.write(resTrack.rows[0].gpx);
+        return res.end();
 		})
 	})
 });
