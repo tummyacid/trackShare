@@ -25,8 +25,7 @@
     L.tileLayer(
 	    'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
 	    {
-	      attribution: `&copy;<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>,
-          &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>`,
+	      attribution: `&copy;<a href="https://opentopomap.org/credits" target="_blank">OpenTopoMap</a>`,
 	      subdomains: 'abc',
 	      maxZoom: 14,
 	    }
@@ -227,7 +226,17 @@
 				{
 					pointList.push([trkpts[k].getAttribute('lat'), trkpts[k].getAttribute('lon')]);
 				}
-				lineLayers = L.polyline.antPath(pointList, { color: '#E7E7E7', opacity: 0.75 , hardwareAccelerated: false , pulseColor: '#485696', delay: 800 });
+				lineLayers = L.polyline.antPath(pointList, {
+					"weight": 5,
+					 color: '#F3DFA2', 
+					 opacity: 0.65 , 
+					 hardwareAccelerated: false , 
+					 pulseColor: '#2F242C', 
+					 "dashArray": [
+							10,
+							60
+						],
+					 delay: 800 });
 				lineLayers.addTo(map);          
 			}
         }
